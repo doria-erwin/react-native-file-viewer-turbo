@@ -199,5 +199,8 @@
     "type": "module-new",
     "languages": "kotlin-objc",
     "version": "0.45.0"
+  },
+  "dependencies": {
+    "react-native-uuid": "^2.0.3"
   }
 }
