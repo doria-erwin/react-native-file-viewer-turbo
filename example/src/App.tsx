@@ -12,7 +12,7 @@ function getUrlExtension(url: string) {
 export default function App() {
   const press = () => {
     const url =
-      'https://github.com/vinzscam/react-native-file-viewer/raw/master/docs/react-native-file-viewer-certificate.pdf';
+      'https://github.com/Vadko/react-native-file-viewer-turbo/raw/main/docs/sample.pdf';
 
     // *IMPORTANT*: The correct file extension is always required.
     // You might encounter issues if the file's extension isn't included
