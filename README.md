@@ -192,10 +192,10 @@ try {
 
 ### `open(filepath: string, options?: Object): Promise<void>`
 
-| Parameter              | Type   | Description                                                                                                                                                                                                                                        |
-| ---------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **filepath**           | string | The absolute path where the file is stored. The file needs to have a valid extension to be successfully detected. Use [react-native-fs constants](https://github.com/itinance/react-native-fs#constants) to determine the absolute path correctly. |
-| **options** (optional) | Object | Some options to customize the behaviour. See below.                                                                                                                                                                                                |
+| Parameter              | Type   | Description                                                                                                                                                                                                                                         |
+| ---------------------- | ------ |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **filepath**           | string | The absolute path where the file is stored. The file needs to have a valid extension to be successfully detected. Use [expo-file-system constants](https://docs.expo.dev/versions/latest/sdk/filesystem/#constants) to determine the absolute path correctly. |
+| **options** (optional) | Object | Some options to customize the behaviour. See below.                                                                                                                                                                                                 |
 
 #### Options
 

@@ -1,31 +1,46 @@
 package com.fileviewerturbo;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 
+import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+
 import java.io.File;
-import java.math.BigInteger;
 
 public class FileViewerTurboModuleImpl {
   final private ReactApplicationContext mContext;
   public static final String NAME = "FileViewerTurbo";
   private static final String SHOW_OPEN_WITH_DIALOG = "showOpenWithDialog" ;
   private static final String SHOW_STORE_SUGGESTIONS ="showAppsSuggestions";
+  private static final String DISMISS_EVENT = "onViewerDidDismiss";
   private static final Integer RN_FILE_VIEWER_REQUEST = 33341;
 
   public FileViewerTurboModuleImpl(ReactApplicationContext context) {
     mContext = context;
+    ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
+      @Override
+      public void onActivityResult(final Activity activity, final int requestCode, final int resultCode, final Intent intent) {
+        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit(DISMISS_EVENT, null);
+      }
+
+    };
+    mContext.addActivityEventListener(mActivityEventListener);
   }
 
-  public void open(String path, String currentId, ReadableMap options, Promise promise) {
+  public void open(String path, ReadableMap options, Promise promise) {
     Uri contentUri = null;
-    Boolean showOpenWithDialog = options.hasKey(SHOW_OPEN_WITH_DIALOG) ? options.getBoolean(SHOW_OPEN_WITH_DIALOG) : false;
-    Boolean showStoreSuggestions = options.hasKey(SHOW_STORE_SUGGESTIONS) ? options.getBoolean(SHOW_STORE_SUGGESTIONS) : false;
+    boolean showOpenWithDialog = options.hasKey(SHOW_OPEN_WITH_DIALOG) && options.getBoolean(SHOW_OPEN_WITH_DIALOG);
+    boolean showStoreSuggestions = options.hasKey(SHOW_STORE_SUGGESTIONS) && options.getBoolean(SHOW_STORE_SUGGESTIONS);
 
     if(path.startsWith("content://")) {
       contentUri = Uri.parse(path);
@@ -38,7 +53,7 @@ public class FileViewerTurboModuleImpl {
       }
       try {
         final String packageName = mContext.getCurrentActivity().getPackageName();
-        final String authority = new StringBuilder(packageName).append(".provider").toString();
+        final String authority = packageName + ".provider";
         contentUri = FileProvider.getUriForFile(mContext.getCurrentActivity(), authority, newFile);
       }
       catch(IllegalArgumentException e) {
@@ -72,7 +87,7 @@ public class FileViewerTurboModuleImpl {
 
     if (shareIntent.resolveActivity(pm) != null) {
       try {
-        mContext.getCurrentActivity().startActivityForResult(intentActivity, new BigInteger(currentId.replace("-", ""), 16).intValue() + RN_FILE_VIEWER_REQUEST);
+        mContext.getCurrentActivity().startActivityForResult(intentActivity, RN_FILE_VIEWER_REQUEST);
         promise.resolve(null);
       }
       catch(Exception e) {
