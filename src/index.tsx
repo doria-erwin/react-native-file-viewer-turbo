@@ -1,7 +1,12 @@
 import type { Options } from './NativeFileViewerTurbo';
 
-import { Platform, NativeModules, NativeEventEmitter } from 'react-native';
-import uuid from 'react-native-uuid';
+import {
+  NativeModules,
+  NativeEventEmitter,
+  Platform,
+  type EmitterSubscription,
+} from 'react-native';
+import { createRef, type MutableRefObject } from 'react';
 
 // @ts-expect-error
 const isTurboModuleEnabled = global.__turboModuleProxy != null;
@@ -10,9 +15,14 @@ const FileViewerTurbo = isTurboModuleEnabled
   ? require('./NativeFileViewerTurbo').default
   : NativeModules.FileViewerTurbo;
 
-const eventEmitter = isTurboModuleEnabled
-  ? null
-  : new NativeEventEmitter(FileViewerTurbo);
+const eventEmitter =
+  // android relies on legacy emitter for backward compatibility
+  isTurboModuleEnabled && Platform.OS === 'ios'
+    ? null
+    : new NativeEventEmitter(FileViewerTurbo);
+
+const dismissListener: MutableRefObject<EmitterSubscription | null> =
+  createRef();
 
 export async function open(
   path: string,
@@ -20,32 +30,25 @@ export async function open(
 ) {
   const { onDismiss, ...nativeOptions } = options;
   try {
-    const currentId = uuid.v4();
+    await FileViewerTurbo.open(normalize(path), nativeOptions);
 
-    await FileViewerTurbo.open(normalize(path), currentId, nativeOptions);
-
-    if (Platform.OS !== 'ios') {
-      return;
-    }
-
-    const dismissSubscription = addListener(
-      'onViewerDidDismiss',
-      ({ id }: { id: string }) => {
-        if (id === currentId) {
-          dismissSubscription?.remove();
-          onDismiss && onDismiss();
-        }
-      }
-    );
+    dismissListener.current = addListener('onViewerDidDismiss', () => {
+      dismissListener.current?.remove();
+      onDismiss && onDismiss();
+    });
   } catch (error) {
     throw error;
   }
 }
 
-const addListener = (event: string, listener: (event: any) => void) => {
-  return isTurboModuleEnabled
-    ? FileViewerTurbo[event](listener)
-    : eventEmitter?.addListener(event, listener);
+const addListener = (
+  event: string,
+  listener: (event: any) => void
+): EmitterSubscription => {
+  // android relies on legacy emitter for backward compatibility
+  return !isTurboModuleEnabled || Platform.OS === 'android'
+    ? eventEmitter?.addListener(event, listener)
+    : FileViewerTurbo[event](listener);
 };
 
 function normalize(path: string) {

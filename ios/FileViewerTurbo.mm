@@ -34,13 +34,13 @@
 @interface CustomQLViewController: QLPreviewController<QLPreviewControllerDataSource>
 
 @property(nonatomic, strong) File *file;
-@property(nonatomic, strong) NSString *invocation;
+@property(nonatomic, strong) NSNumber *invocation;
 
 @end
 
 @implementation CustomQLViewController
 
-- (instancetype)initWithFile:(File *)file identifier:(NSString *)invocation {
+- (instancetype)initWithFile:(File *)file identifier:(NSNumber *)invocation {
     if(self = [super init]) {
         _file = file;
         _invocation = invocation;
@@ -67,7 +67,8 @@
   bool hasListeners;
 }
 
-static RCTEventEmitter* staticEventEmitter = nil;
+static RCTEventEmitter *staticEventEmitter = nil;
+static NSNumber *invocationId = @33341;
 
 -(void)startObserving {
     hasListeners = YES;
@@ -130,7 +131,7 @@ static RCTEventEmitter* staticEventEmitter = nil;
 - (void)_sendEventWithName:(NSString *)eventName body:(id)body {
   #ifdef RCT_NEW_ARCH_ENABLED
     if ([eventName isEqualToString:@"onViewerDidDismiss"]) {
-      [self emitOnViewerDidDismiss:body];
+      [self emitOnViewerDidDismiss];
     }
   #else
     if (hasListeners && staticEventEmitter != nil) {
@@ -147,22 +148,25 @@ static RCTEventEmitter* staticEventEmitter = nil;
 
 
 - (void)previewControllerDidDismiss:(CustomQLViewController *)controller {
-  [self _sendEventWithName:@"onViewerDidDismiss" body:@{@"id": ((CustomQLViewController*)controller).invocation}];
+  [self _sendEventWithName:@"onViewerDidDismiss" body:nil];
 }
 
 
 - (void)dismissView:(id)sender {
     UIViewController* controller = [FileViewerTurbo topViewController];
-    [self _sendEventWithName:@"onViewerDidDismiss" body:@{@"id": ((CustomQLViewController*)controller).invocation}];
+    [self _sendEventWithName:@"onViewerDidDismiss" body:nil];
     [[FileViewerTurbo topViewController] dismissViewControllerAnimated:YES completion:nil];
 }
 
 RCT_EXPORT_MODULE(FileViewerTurbo)
 
-RCT_EXPORT_METHOD(open:(NSString *)path currentId:(NSString *)currentId options:(NSDictionary *)options resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(open:(NSString *)path
+                  options:(NSDictionary *)options
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+  
       NSString *displayName = options[@"displayName"];
       File *file = [[File alloc] initWithPath:path title:displayName];
-      NSString *invocationId = currentId;
   
       QLPreviewController *controller = [[CustomQLViewController alloc] initWithFile:file identifier:invocationId];
       controller.delegate = self;

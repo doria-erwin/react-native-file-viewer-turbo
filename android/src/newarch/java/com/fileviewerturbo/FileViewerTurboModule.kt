@@ -9,7 +9,15 @@ class FileViewerTurboModule(reactContext: ReactApplicationContext) : NativeFileV
 
   override fun getName(): String = FileViewerTurboModuleImpl.NAME
 
-  override fun open(path: String?, currentId: String?, options: ReadableMap?, promise: Promise?) {
-    implementation.open(path, currentId, options, promise)
+  override fun open(path: String?, options: ReadableMap?, promise: Promise?) {
+    implementation.open(path, options, promise)
+  }
+
+  override fun addListener(eventType: String?) {
+    //
+  }
+
+  override fun removeListeners(count: Double) {
+    //
   }
 }

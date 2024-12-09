@@ -29,7 +29,9 @@ export default function App() {
       toFile: localFile,
     };
     downloadFile(options).promise.then(() =>
-      open(localFile).then(console.log).catch(console.error)
+      open(localFile, { onDismiss: () => console.log('dismissed!') })
+        .then(console.log)
+        .catch(console.error)
     );
   };
 
