@@ -10774,7 +10774,6 @@ __metadata:
     react: 18.3.1
     react-native: 0.76.3
     react-native-builder-bob: ^0.34.0
-    react-native-uuid: ^2.0.3
     release-it: ^17.10.0
     turbo: ^1.10.7
     typescript: ^5.2.2
@@ -10783,13 +10782,6 @@ __metadata:
     react-native: "*"
   languageName: unknown
   linkType: soft
-
-"react-native-uuid@npm:^2.0.3":
-  version: 2.0.3
-  resolution: "react-native-uuid@npm:2.0.3"
-  checksum: e47774481feaed5d38f75fb4b03f5189c03e7452038f1b0fa56677add8a8bdef64ec7ad5e83f9fa761d8788cac5c8e554ade07e82a2818145337df7c883e2124
-  languageName: node
-  linkType: hard
 
 "react-native@npm:0.76.3":
   version: 0.76.3
