@@ -4,6 +4,7 @@ import type { EventEmitter } from 'react-native/Libraries/Types/CodegenTypes';
 
 export type Options = {
   displayName?: string;
+  doneButtonTitle?: string;
   showOpenWithDialog?: boolean;
   showAppsSuggestions?: boolean;
 };
