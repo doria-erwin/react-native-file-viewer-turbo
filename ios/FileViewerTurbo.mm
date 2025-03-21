@@ -164,27 +164,35 @@ RCT_EXPORT_METHOD(open:(NSString *)path
                   options:(NSDictionary *)options
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
-  
+
       NSString *displayName = options[@"displayName"];
-      File *file = [[File alloc] initWithPath:path title:displayName];
+      NSString *doneButtonTitle = options[@"doneButtonTitle"];
   
+      File *file = [[File alloc] initWithPath:path title:displayName];
+
       QLPreviewController *controller = [[CustomQLViewController alloc] initWithFile:file identifier:invocationId];
       controller.delegate = self;
-  
+
       if (@available(iOS 13.0, *)) {
           [controller setModalInPresentation: true];
       }
-  
+
       UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:controller];
-      controller.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissView:)];
   
-       if ([QLPreviewController canPreviewItem:file]) {
-         [[FileViewerTurbo topViewController] presentViewController:navigationController animated:YES completion:^{
-             resolve(nil);
-           }];
-       } else {
-           reject(@"FileViewerTurbo:open", @"File not supported", nil);
-       }
+      if (doneButtonTitle) {
+        controller.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:doneButtonTitle style:UIBarButtonItemStylePlain target:self action:@selector(dismissView:)];
+      } else {
+        controller.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissView:)];
+
+      }
+ 
+      if ([QLPreviewController canPreviewItem:file]) {
+        [[FileViewerTurbo topViewController] presentViewController:navigationController animated:YES completion:^{
+          resolve(nil);
+        }];
+      } else {
+        reject(@"FileViewerTurbo:open", @"File not supported", nil);
+      }
 };
 
 #ifdef RCT_NEW_ARCH_ENABLED

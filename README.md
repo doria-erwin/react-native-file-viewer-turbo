@@ -17,7 +17,7 @@ This library requires React Native 0.76.3 or newer. It is compatible with Expo S
 npx expo install react-native-file-viewer-turbo
 ```
 
-Add plugin to your `app.json` or `app.config.js` (it will modify AndroidManifest.xml as described below in extra step for Android section):
+Add plugin to your `app.json` or `app.config.js` with preferred `mimeTypes` (it will modify AndroidManifest.xml as described below in extra step for Android section):
 
 ```json
 {
@@ -26,7 +26,7 @@ Add plugin to your `app.json` or `app.config.js` (it will modify AndroidManifest
       "react-native-file-viewer-turbo",
       {
         "mimeTypes": [
-          "*/*" // or any other mimeType you want to specifically include
+          "*/*"
         ]
       }
     ]
@@ -68,6 +68,25 @@ For example, if you know upfront that your app is supposed to open PDF files, th
 + </queries>
 </manifest>
 ```
+
+## API
+
+### `open(filepath: string, options?: Options): Promise<void>`
+
+| Parameter              | Type   | Description                                                                                                                                                                                                                                         |
+| ---------------------- | ------ |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **filepath**           | string | The absolute path where the file is stored. The file needs to have a valid extension to be successfully detected. Use [expo-file-system constants](https://docs.expo.dev/versions/latest/sdk/filesystem/#constants) to determine the absolute path correctly. |
+| **options** (optional) | Object | Some options to customize the behaviour. See below.                                                                                                                                                                                                 |
+
+#### Options
+
+| Parameter                          | Type    | Platform     | Description                                                                                        |
+|------------------------------------|---------|--------------|----------------------------------------------------------------------------------------------------|
+| **displayName** (optional)         | string  | iOS          | Customize the QuickLook title                                                                      |
+| **doneButtonTitle** (optional)     | string  | iOS          | Customize UINavigationController Done button title                                                 |
+| **onDismiss** (optional)           | function | iOS, Android | Callback invoked when the viewer is being dismissed                                                |
+| **showOpenWithDialog** (optional)  | boolean | Android      | If there is more than one app that can open the file, show an _Open With_ dialogue box             |
+| **showAppsSuggestions** (optional) | boolean | Android      | If there is not an installed app that can open the file, open the Play Store with suggested apps   |
 
 **IMPORTANT**: Try to be as granular as possible when defining your own queries. This might affect your Play Store approval, as mentioned in [Package visibility filtering on Android](https://developer.android.com/training/package-visibility).
 
@@ -190,26 +209,6 @@ try {
   // error
 }
 ```
-
-## API
-
-### `open(filepath: string, options?: Object): Promise<void>`
-
-| Parameter              | Type   | Description                                                                                                                                                                                                                                         |
-| ---------------------- | ------ |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **filepath**           | string | The absolute path where the file is stored. The file needs to have a valid extension to be successfully detected. Use [expo-file-system constants](https://docs.expo.dev/versions/latest/sdk/filesystem/#constants) to determine the absolute path correctly. |
-| **options** (optional) | Object | Some options to customize the behaviour. See below.                                                                                                                                                                                                 |
-
-#### Options
-
-| Parameter                          | Type     | Description                                                                                                      |
-| ---------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
-| **displayName** (optional)         | string   | Customize the QuickLook title (iOS only).                                                                        |
-| **onDismiss** (optional)           | function | Callback invoked when the viewer is being dismissed (iOS and Android only).                                      |
-| **showOpenWithDialog** (optional)  | boolean  | If there is more than one app that can open the file, show an _Open With_ dialogue box (Android only).           |
-| **showAppsSuggestions** (optional) | boolean  | If there is not an installed app that can open the file, open the Play Store with suggested apps (Android only). |
-
-
 
 ## Contributing
 

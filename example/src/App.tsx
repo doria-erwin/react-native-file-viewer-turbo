@@ -29,7 +29,10 @@ export default function App() {
       toFile: localFile,
     };
     downloadFile(options).promise.then(() =>
-      open(localFile, { onDismiss: () => console.log('dismissed!') })
+      open(localFile, {
+        onDismiss: () => console.log('dismissed!'),
+        doneButtonTitle: 'Custom done',
+      })
         .then(console.log)
         .catch(console.error)
     );
