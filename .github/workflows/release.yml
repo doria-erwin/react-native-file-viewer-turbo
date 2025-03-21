@@ -3,18 +3,51 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '.github/**/*.yml'
+      - '.gitignore'
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+steps:
+  - name: Checkout
+    uses: actions/checkout@v3
 
-      - name: Setup
-        uses: ./.github/actions/setup
+  - name: Setup
+    uses: ./.github/actions/setup
 
-      - uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          access: public
+  - name: Prepare env
+    run: echo "previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> $GITHUB_ENV
+
+  - name: Create Tag
+    id: create_tag
+    uses: jaywcjlove/create-tag-action@main
+    if: env.previous_tag
+    with:
+      package-path: ./package.json
+
+  - name: Generate Changelog
+    id: changelog
+    uses: jaywcjlove/changelog-generator@main
+    if: steps.create_tag.outputs.successful == 'true'
+    with:
+      head-ref: ${{steps.create_tag.outputs.version}}
+      filter: (^[\s]+?[R|r]elease)|(^[R|r]elease)
+
+  - name: Create Release
+    uses: jaywcjlove/create-tag-action@main
+    id: release
+    if: steps.create_tag.outputs.successful == 'true'
+    with:
+      version: ${{steps.create_tag.outputs.version}}
+      release: true
+      body: |
+        ```bash
+        yarn add react-native-file-viewer-turbo@${{steps.create_tag.outputs.versionNumber}}
+        ```
+
+        ${{ steps.changelog.outputs.compareurl }}
+        ${{ steps.changelog.outputs.changelog }}
+
+  - uses: JS-DevTools/npm-publish@v3
+    with:
+      token: ${{ secrets.NPM_TOKEN }}
+      access: public
