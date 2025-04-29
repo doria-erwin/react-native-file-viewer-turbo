@@ -203,4 +203,12 @@ RCT_EXPORT_METHOD(open:(NSString *)path
 }
 #endif
 
+RCT_EXPORT_METHOD(addListener:(NSString *)eventName) {
+  // Required for New Architecture event support
+}
+
+RCT_EXPORT_METHOD(removeListeners:(double)count) {
+  // Required for New Architecture event support
+}
+
 @end
