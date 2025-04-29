@@ -44,11 +44,15 @@ export async function open(
 const addListener = (
   event: string,
   listener: (event: any) => void
-): EmitterSubscription => {
+): EmitterSubscription | { remove: () => void } => {
   // android relies on legacy emitter for backward compatibility
 
   if (!isTurboModuleEnabled || Platform.OS === 'android') {
-    return eventEmitter.addListener(event, listener)
+    if (eventEmitter) {
+      return eventEmitter.addListener(event, listener)
+    }
+
+    return { remove: () => { } }
   }
   return FileViewerTurbo[event](listener);
 };
