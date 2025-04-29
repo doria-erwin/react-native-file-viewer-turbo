@@ -44,7 +44,7 @@ export async function open(
 const addListener = (
   event: string,
   listener: (event: any) => void
-): EmitterSubscription | { remove: () => void } => {
+): any => {
   // android relies on legacy emitter for backward compatibility
 
   if (!isTurboModuleEnabled || Platform.OS === 'android') {
