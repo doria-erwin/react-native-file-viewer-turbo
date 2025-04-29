@@ -46,9 +46,11 @@ const addListener = (
   listener: (event: any) => void
 ): EmitterSubscription => {
   // android relies on legacy emitter for backward compatibility
-  return !isTurboModuleEnabled || Platform.OS === 'android'
-    ? eventEmitter?.addListener(event, listener) ?? { remove: () => { } }
-    : FileViewerTurbo[event](listener);
+
+  if (!isTurboModuleEnabled || Platform.OS === 'android') {
+    return eventEmitter.addListener(event, listener)
+  }
+  return FileViewerTurbo[event](listener);
 };
 
 function normalize(path: string) {
